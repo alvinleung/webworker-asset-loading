@@ -1,0 +1,11 @@
+{
+  "name": "webworker-asset-loading",
+  "version": "1.0.0",
+  "description": "An experiment for loading assets with webworker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alvin Leung",
+  "license": "ISC"
+}
