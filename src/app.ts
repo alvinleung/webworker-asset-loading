@@ -1,3 +1,6 @@
+// interesting discussion on whether webworker actually improves loading poerformance
+// https://dev.to/trezy/loading-images-with-web-workers-49ap
+
 function createWorker(fn: (event: MessageEvent) => void) {
   var blob = new Blob(["self.onmessage = ", fn.toString()], {
     type: "text/javascript",
@@ -71,7 +74,6 @@ function loadAllWorker(urls: string[]) {
 }
 
 (async () => {
-  console.log("init test...");
   const spinningBox = document.createElement("div");
   spinningBox.style.width = "100px";
   spinningBox.style.height = "100px";
@@ -84,23 +86,38 @@ function loadAllWorker(urls: string[]) {
     rot++;
   }, 16);
 
+  const beginBenchmarkButton = document.createElement("button");
+  beginBenchmarkButton.innerHTML = "Begin benchmark";
+  beginBenchmarkButton.style.marginTop = "64px";
+  beginBenchmarkButton.addEventListener("click", beginBenchmark);
+  document.body.appendChild(beginBenchmarkButton);
+})();
+
+async function beginBenchmark() {
+  logInfo("init test...");
   setTimeout(async () => {
-    console.log("first run =============================================");
+    logInfo("first run =============================================");
     await runTest();
-    console.log("second run =============================================");
+    logInfo("second run =============================================");
     await runTest();
-    console.log("third run =============================================");
+    logInfo("third run =============================================");
     await runTest();
     console.log("benchmark done");
   }, 2000);
-})();
+}
 
 async function runTest() {
-  console.time("Main thread loading");
+  let beginTime = performance.now();
   await loadAllMainThread(getRandomImageUrls());
-  console.timeEnd("Main thread loading");
+  logInfo(`Main thread loading took: ${performance.now() - beginTime}`);
 
-  console.time("Worker loading");
+  beginTime = performance.now();
   await loadAllWorker(getRandomImageUrls());
-  console.timeEnd("Worker loading");
+  logInfo(`Worker thread loading took: ${performance.now() - beginTime}`);
+}
+
+function logInfo(s: string) {
+  const div = document.createElement("div");
+  div.innerHTML = s;
+  document.body.appendChild(div);
 }
